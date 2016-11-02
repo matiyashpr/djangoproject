@@ -1,3 +1,4 @@
+{% load static from staticfiles %}
 
 <!DOCTYPE html>
 <html lang="uk">
@@ -7,8 +8,9 @@
     <meta name="description"
           value="Система Обліку Студентів Навчального Закладу" />  
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="./css/main.css">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static "css/main.css" %}">
+    <link rel="stylesheet" href="/static/css/main.css">
 
     <!--        <style type="text/css">.col-xs-12, .col-xs-4, .col-xs-8 {border:1px solid red;}</style>-->
 
@@ -47,7 +49,7 @@
       <div class="row" id="sub-header">
         <div class="col-xs-12">
           <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="{% url"home" %}">Студенти</a></li>
+            <li role="presentation" class="active"><a href="{% url "home" %}">Студенти</a></li>
             <li role="presentation"><a href="/journal">Відвідування</a></li>
             <li role="presentation"><a href="{% url "groups" %}">Групи</a></li>
           </ul>
@@ -78,12 +80,13 @@
                   <th>Дії</th>
               </thead>
               <tbody>
+                  {% for student in students %}
                 <tr>
-                  <td>1</td>
-                  <td><img height="30" width="30" src="./jmg/Kurilas.jpg" class="img-circle" /></td>
-                  <td><a title="Редагувати" href="{% url "students_edit" 1 %}">Курилас</a></td>
-                  <td><a title="Редагувати" href="{% url "students_edit" 1 %}">Олег</a></td>
-                  <td>2123</td>
+                    <td>{{ forloop.counter }}</td>
+                    <td><img height="30" width="30" src="{% static student.image %}" class="img-circle" /></td>
+                    <td><a title="Редагувати" href="{% url "students_edit" student.id %}"></a>{{ student.last_name }}</td>
+                    <td><a title="Редагувати" href="{% url "students_edit" student.id %}"></a>{{ student.first_name }}</td>
+                    <td>{{ student.ticket }}</td>
                   <td>
                     <div class="dropdown">
                       <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Дія
@@ -91,68 +94,20 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li role="presentation">
-                          <a role="menuitem" tabindex="-1" href="/journal/1">Відвідування</a>
+                          <a role="menuitem" tabindex="-1" href="/journal/{{students.id}}">Відвідування</a>
                         </li>
                         <li role="presentation">
-                          <a href="{% url "students_edit" 1 %}" role="menuitem" tabindex="-1">Редагувати</a>
+                            <a href="{% url "students_edit" student.id %}" role="menuitem" tabindex="-1">Редагувати</a>
                         </li>
                         <li role="presentation">
-                          <a href="{% url "students_delete" 1 %}" role="menuitem" tabindex="-1">Видалити</a>
+                          <a href="{% url "students_delete" student.id %}" role="menuitem" tabindex="-1">Видалити</a>
                         </li>
                       </ul>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td>2</td>
-                  <td><img height="30" width="30" src="./jmg/Drofa.jpg" class="img-circle" /></td>
-                  <td><a title="Редагувати" href="{% url "students_edit" 2 %}">Дрофа</a></td>
-                  <td><a title="Редагувати" href="{% url "students_edit" 2 %}">Вячеслав</a></td>
-                  <td>1147</td>
-                  <td>
-                    <div class="dropdown">
-                      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Дія
-                        <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li role="presentation">
-                          <a role="menuitem" tabindex="-1" href="/journal/2">Відвідування</a>
-                        </li>
-                        <li role="presentation">
-                          <a href="{% url "students_edit" 2 %}" role="menuitem" tabindex="-1">Редагувати</a>
-                        </li>
-                        <li role="presentation">
-                          <a href="{% url "students_delete" 2 %}" role="menuitem" tabindex="-1">Видалити</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td><img height="30" width="30" src="./jmg/Pristansky.jpg" class="img-circle" /></td>
-                  <td><a title="Редагувати" href="{% url "students_edit" 3 %}">Пристанський</a></td>
-                  <td><a title="Редагувати" href="{% url "students_edit" 3 %}">Любомир</a></td>
-                  <td>3422</td>
-                  <td>
-                    <div class="dropdown">
-                      <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Дія
-                        <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li role="presentation">
-                          <a role="menuitem" tabindex="-1" href="/journal/3">Відвідування</a>
-                        </li>
-                        <li role="presentation">
-                          <a href="{% url "students_edit" 3 %}" role="menuitem" tabindex="-1">Редагувати</a>
-                        </li>
-                        <li role="presentation">
-                          <a href="{% url "students_delete" 3 %}" role="menuitem" tabindex="-1">Видалити</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
+                  {% endfor %}
               </tbody>                           
             </table>
             <nav>
@@ -191,7 +146,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 
-    <script src="js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
 
   </body>
 </html>
