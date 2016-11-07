@@ -16,7 +16,7 @@ url(r'^groups/(?P<gid>\d+)/edit/$', 'students.views.groups_edit', name='groups_e
 url(r'^groups/(?P<gid>\d+)/delete/$', 'students.views.groups_delete', name='groups_delete'),
 
 url(r'^admin/', include(admin.site.urls)),
-)
+                      )
 
 
 # Examples:
