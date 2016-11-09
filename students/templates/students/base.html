@@ -5,7 +5,7 @@
 <html lang="uk">
   <head>
     <meta charset="UTF-8">
-    <title>Сервіс Обліку Студентів</title>
+    <title>Сервіс Обліку Студентів - {% block meta_title %}{% endblock meta_title %}</title>
     <meta name="description"
           value="Система Обліку Студентів Навчального Закладу" />  
 
@@ -70,13 +70,13 @@
           <div class="alert alert-warning">Зміни скасовано.</div>
             {% endcomment %}
             <h2>{% block title %}{% endblock title %}</h2>
-            {% block content %}{% endblock content %}
+           
+             {% block content %}{% endblock content %}
          
         </div>
       </div>
 
-
-
+       
       <!-- End Main Page Content -->
       <!-- Start Footer -->
 
@@ -96,6 +96,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 
     <script src="/static/js/bootstrap.min.js"></script>
-
+      {% block extra_js %}{% endblock extra_js %}
   </body>
 </html>

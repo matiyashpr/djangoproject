@@ -1,4 +1,4 @@
-{% extends "students/base.html" %}
+{% extends "students/base_groups.html" %}
 {% load static from staticfiles %}
 
 {% block meta_title %}Студенти{% endblock meta_title %}
@@ -47,14 +47,7 @@
 
         </tbody>                           
     </table>
-    <nav>
-        <ul class="pagination">
-            <li  class="active"><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">Далі</a></li>
-
-        </ul>
-    </nav>
+    
     <!-- End Students Listing -->
 </div>
 {% endblock content %}
