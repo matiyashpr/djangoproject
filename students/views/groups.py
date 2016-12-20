@@ -1,23 +1,39 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from ..models import Group
 
 
 def groups_list(request):
-    groups = (
-            {'id' : 1,
-            'id_group' : u'44-ПЗ',
-            'leader' : u'Матіяш Василь'},
-        
-            {'id' : 2,
-             'id_group' : u'43-ПЗ',
-             'leader' : u'Савечко Тарас'},
-        
-            {'id' : 3,
-             'id_group' : u'45-КІ',
-             'leader' : u'Надія Надієчка'},
-            )
-    return render(request, 'students/groups_list.html', {'groups': groups})
+    groups = Group.objects.all()
+    
+    if request.get_full_path() == "/":
+        #redirect request.GET on its copy(deep copy) which I will amend
+        request.GET = request.GET.copy()
+        #assign 'order_by' value 'last_name' 
+        request.GET.__setitem__('order_by', 'title')
+
+    order_by = request.GET.get('order_by', '')
+    if order_by in ('title', 'leader'):
+        groups = groups.order_by(order_by)
+        if request.GET.get('reverse', '') == '1':
+            groups = groups.reverse()
+    
+    
+    paginator = Paginator(groups, 3)
+    page = request.GET.get('page')
+    try:
+        groups = paginator.page(page)
+    except PageNotAnInteger:
+            groups = paginator.page (1)
+    except EmptyPage:
+         groups = paginator.page(paginator.num_pages)
+                
+                
+    return render(request, 'students/groups_list.html',
+                 {'groups' : groups})
+
 
 def groups_add(request):
 	return HttpResponse('<h1>Group Add Form</h1>')

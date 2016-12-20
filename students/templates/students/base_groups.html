@@ -40,8 +40,8 @@
                     <strong>Група:</strong>
                     <select>
                         <option value="">Усі Студенти</option>
-                        <option value="">МтМ - 21, Подоба Віталій (No 254)</option>
-                        <option value="">МтМ - 22, Корост Андрій (No 2123)</option>
+                        <option value="">14-ПЗ, Роман Сисюк</option>
+                        <option value="">44-ПЗ, Матіяш Василь</option>
                     </select>
                 </div>
             </div>
@@ -77,14 +77,24 @@
             </div>
 
             {% block pagination %}
+            {% if groups.has_other_pages %}
+            {% with order_by=request.GET.order_by reverse=request.GET.reverse %}
             <nav>
                 <ul class="pagination">
-                    <li  class="active"><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">Далі</a></li>
-
+                    <li>
+                        <a href="{% url "groups" %}?page=1&amp;order_by={{ order_by }}&amp;reverse={{ reverse }}">&laquo;</a>
+                    </li>
+                    {% for p in groups.paginator.page_range %}
+                    <li {% if groups.number == p %}class="active"{% endif %}>
+                        <a href="{% url "groups" %}?page={{ p }}&amp;order_by={{ order_by }}&amp;reverse={{ reverse }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    <li><a href="{% url "groups" %}?page={{ groups.paginator.num_pages }}&amp;order_by={{ order_by }}&amp;reverse={{ reverse }}">&raquo;</a>
+                    </li>
                 </ul>
             </nav>
+            {% endwith %}
+            {% endif %}
             {% endblock pagination %}
 
             <!-- End Main Page Content -->

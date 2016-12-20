@@ -10,19 +10,42 @@
 <div>
     <!-- Start Students Listing -->
     <table class="table table-hover table-striped">
+        {% with order_by=request.GET.order_by reverse=request.GET.reverse %}
         <thead>
             <tr>
-                <th> <a href="">№</a></th>
-                <th><a href="">Назва &uarr;</a></th>
-                <th><a href="#">Староста</a></th>
+                <th>
+                 <a href="">№</a></th>
+               
+                 <th>
+                     <a href="{% url "groups" %}?order_by=title{% if order_by == 'title' and reverse != '1' %}&amp;reverse=1{% endif %}">
+                    Назва
+                       
+                        {% if order_by == 'title' and reverse != '1' %}&uarr;
+                        {% elif order_by == 'title' and reverse == '1' %}&darr;
+                    
+                        {% endif %}
+                    </a>
+                </th>
+               
+                 <th>
+                     <a href="{% url "groups" %}?order_by=leader{% if order_by == 'leader' and reverse != '1' %}&amp;reverse=1{% endif %}">
+                    Староста
+                    
+                        {% if order_by == 'leader' and reverse != '1' %}&uarr;
+                        {% elif order_by == 'leader' and reverse == '1' %}&darr;
+
+                        {% endif %}
+                    </a>
+                </th>
                 <th>Дії</th>
         </thead>
+        {% endwith %}
         <tbody>
             {% for group in groups %}
             <tr>
 
                 <td>{{ forloop.counter }}</td>
-                <td><a title="Редагувати" href="{% url "groups_edit" group.id %}"></a>{{ group.id_group }}</td>
+                <td><a title="Редагувати" href="{% url "groups_edit" group.id %}"></a>{{ group.title }}</td>
                 <td>{{group.leader}}</td>
                 <td>
                     <div class="dropdown">
