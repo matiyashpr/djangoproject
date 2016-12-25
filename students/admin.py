@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from .models import Student
-from .models import Group
+from models.students import Student
+from models.groups import Group
 
 
 # Register your models here.

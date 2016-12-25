@@ -66,9 +66,14 @@
             <div class="row" id="content-columns">
                 <div class="col-xs-12" id="content-column">
                     <!-- Status Message -->
-                    {% comment "Not used alert so far" %}
-                    <div class="alert alert-warning">Зміни скасовано.</div>
-                    {% endcomment %}
+                    {% block status_message %}
+                    <!-- Status Message -->
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</p>
+                    {% endfor %}
+                    {% endif %}
+                    {% endblock %}
                     <h2>{% block title %}{% endblock title %}</h2>
 
                     {% block content %}{% endblock content %}
