@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'students',	
 )
 
@@ -97,3 +98,17 @@ STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
+
+
+#email settings
+
+ADMIN_EMAIL = 'admin@studentsdb.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '465'
+EMAIL_HOST_USER = 'studentsdb.ua@gmail.com'
+EMAIL_HOST_PASSWORD = 'studentsdb.matiyash.vol'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
