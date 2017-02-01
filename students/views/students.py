@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib import messages
 
 from django.forms import ModelForm
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, DeleteView
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -153,10 +153,6 @@ def students_add(request):
                 
  
 
-
-def students_delete(request, sid):
-	return HttpResponse('<h1>Delete Student %s</h1>' % sid)
-
 class StudentUpdateForm(ModelForm):
     class Meta:
         model = Student
@@ -195,7 +191,24 @@ class StudentUpdateView(UpdateView):
     def post(self, request, *args, **kwargs):
         if request.POST.get('cancel_button'):
             return HttpResponseRedirect(
-                u'%s?status_message=Редагування студента відмінено!' %
+                u'%s?status_message=Редагування студента відмінено!'  %
                 reverse('home'))
         else:
             return super(StudentUpdateView, self).post(request, *args, **kwargs)
+        
+        
+
+class StudentDeleteView(DeleteView):
+    model = Student
+    template_name = 'students/students_confirm_delete.html'
+        
+    def get_success_url(self):
+        return u'%s?status_message=Студента успішно видалено!' % reverse('home')
+    
+    
+class GroupDeleteView(DeleteView):
+    model = Group
+    template_name = 'students/group_delete'
+    
+    def get_success_url(self):
+        return u'%s?status_message=Групу успішно видалено!' % reverse('home')
