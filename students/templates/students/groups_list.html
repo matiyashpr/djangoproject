@@ -45,7 +45,7 @@
             <tr>
 
                 <td>{{ forloop.counter }}</td>
-                <td><a title="Редагувати" href="{% url "groups_edit" group.id %}"></a>{{ group.title }}</td>
+                <td><a title="Редагувати" href="{% url "groups_edit" group.id %}">{{ group.title }}</a></td>
                 <td>{{group.leader}}</td>
                 <td>
                     <div class="dropdown">

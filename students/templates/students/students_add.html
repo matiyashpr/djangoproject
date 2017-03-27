@@ -38,10 +38,10 @@
         </div>
     </div>
 
-    <div class="form-group {% if errors.birthday %}has-error{% endif %}">
+    <div class=" dateinput form-group {% if errors.birthday %}has-error{% endif %}">
         <label for="birthday" class="col-sm-2 control-label">Дата народження</label>
         <div class="col-sm-10">
-            <input type="text" value="{{ request.POST.birthday }}" name="birthday" id="birthday" class="form-control" placeholder="Напр. 1998-11-26" />
+            <input type="text" value="{{ request.POST.birthday }}" name="birthday" id="birthday" class="dateinput form-control" placeholder="Напр. 1998-11-26" />
             <span class="help-block">{{ errors.birthday }}</span>
         </div>
     </div>
