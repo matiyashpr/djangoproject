@@ -40,7 +40,7 @@ class GroupAdmin(admin.ModelAdmin):
                      'notes']
 
     def view_on_site(self, obj):
-        return reverse('groups_list', kwargs={'pk': obj.id})
+        return reverse('groups_edit', kwargs={'pk': obj.id})
 
 # Register your models here.
 
