@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -6,6 +5,7 @@ from django.views.generic.base import TemplateView
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from calendar import monthrange, weekday, day_abbr
+from django.utils.translation import ugettext_lazy as _
 
 from django.core.urlresolvers import reverse
 from django.views.generic.base import TemplateView
@@ -38,7 +38,7 @@ class JournalView(TemplateView):
         
         myear, mmonth = month.year, month.month
         number_of_days = monthrange(myear, mmonth)[1]
-        context['month_header'] = [{'day' : d, 'verbose' : day_abbr[weekday(myear, mmonth, d)][:2]}
+        context['month_header'] = [{'day' : d, 'verbose' : day_abbr[weekday(myear, mmonth, d)][:3]}
         for d in range(1, number_of_days+1)]
         
         if kwargs.get('pk'):

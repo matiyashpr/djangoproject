@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -7,6 +6,7 @@ from django.contrib import messages
 
 from django.forms import ModelForm
 from django.views.generic import CreateView, UpdateView, DeleteView
+from django.utils.translation import ugettext_lazy as _
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Div, HTML
@@ -37,8 +37,8 @@ class GroupCreateForm(ModelForm):
         # add buttons
         self.helper.layout.append(FormActions(
             Div(css_class = self.helper.label_class),
-            Submit('add_button', u'Зберегти', css_class="btn btn-primary"),
-            HTML(u"<a class='btn btn-link' name='cancel_button' href='{% url 'groups' %}?status_message=Додавання/редагування групи скасовано!'>Скасувати</a>"),
+            Submit('add_button', _(u'Save'), css_class="btn btn-primary"),
+            HTML(_(u"<a class='btn btn-link' name='cancel_button' href='{% url 'groups' %}?status_message=Add / Edit group canceled!'>Cancel</a>")),
         ))
         self.fields['leader'].queryset = self.fields['leader'].queryset.none()
 
@@ -55,7 +55,7 @@ class GroupCreateView(CreateView):
     form_class = GroupCreateForm
 
     def get_success_url(self):
-        messages.info(self.request, u'Групу %s успішно додано!' % self.object.title)
+        messages.info(self.request, _(u'Group %s successfully added!') % self.object.title)
         return reverse('groups')
 
 class GroupUpdateView(UpdateView):
@@ -68,11 +68,11 @@ class GroupUpdateView(UpdateView):
         if not leader or leader.student_group_id == form.instance.id:
             return super(GroupUpdateView, self).form_valid(form)
         else:
-            messages.error(self.request, u'Студент належить до іншої групи')
+            messages.error(self.request, _(u'The student belongs to another group'))
             return super(GroupUpdateView, self).form_invalid(form)
 
     def get_success_url(self):
-        messages.info(self.request, u'Групу %s успішно збережено!' % self.object.title)
+        messages.info(self.request, _(u'Group %s successfully saved!') % self.object.title)
         return reverse('groups')
 
 
@@ -110,13 +110,13 @@ class GroupDeleteView(DeleteView):
     template_name = 'students/group_delete.html'
 
     def get_success_url(self):
-        return u'%s?status_message=Групу успішно видалено!' % reverse('groups')
+        return _(u'%s?status_message=Group successfully deleted!') % reverse('groups')
     
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
         try:
             self.object.delete()
         except:
-            return HttpResponseRedirect(u"%s?status_message=Не можливо видалити групу - скоріш за все в групі ще є студенти!" % reverse('groups'))
+             return HttpResponseRedirect(_(u"%s?status_message=Unable to delete a group - probably in the group are still students!") % reverse('groups'))
         else:
             return HttpResponseRedirect(self.get_success_url())

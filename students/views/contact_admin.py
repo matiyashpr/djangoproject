@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import logging
 from django.shortcuts import render
 from django import forms
@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -33,17 +34,17 @@ class ContactForm(forms.Form):
         self.helper.field_class = 'col-sm-10'
         
         #form buttons
-        self.helper.add_input(Submit('send_button', u'Надіслати'))
+        self.helper.add_input(Submit('send_button', _(u'Send')))
         
     from_email = forms.EmailField(
-        label=u"Ваша Емейл Адреса")
+        label=_(u"Your E-mail"))
 
     subject = forms.CharField(
-        label=u"Заголовок листа",
+        label=_(u"Title"),
         max_length=128)
 
     message = forms.CharField(
-        label=u"Текст повідомлення",
+        label=_(u"Text message"),
         widget=forms.Textarea)
     
 
@@ -62,11 +63,11 @@ def contact_admin(request):
                 send_mail(subject, message, from_email, [ADMIN_EMAIL])
 
             except Exception:
-                message = u'Під час відправки листа виникла непередбачувана помилка. Спробуйте скористатись даною формою пізніше'
+                message = _(u'When you send a letter to an unexpected error occurred. Try using this form later')
                 logger = logging.getLogger(__name__)
                 logger.exception(message)
             else:
-                message = u'Повідомлення успішно надіслане!'
+                message = _(u'Message sent successfully!')
 
             return HttpResponseRedirect(
                 u'%s?status_message=%s' % (reverse('contact_admin'),message))

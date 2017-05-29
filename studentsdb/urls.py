@@ -4,8 +4,16 @@ from students.views.groups import GroupCreateView, GroupUpdateView, GroupDeleteV
 from students.views.students import EditStudentView, StudentDeleteView
 from .settings import MEDIA_ROOT, DEBUG
 from students.views.journal import JournalView
+from django.conf.urls import include, url 
+from django.conf.urls.i18n import i18n_patterns
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
+from django.views.generic.base import RedirectView, TemplateView
 
 
+js_info_dict = {
+    'packages': ('students',),
+}
 
 urlpatterns = patterns('',
 # Students urls
@@ -22,11 +30,26 @@ urlpatterns = patterns('',
     url(r'^groups/(?P<pk>\d+)/edit/$', GroupUpdateView.as_view(), name='groups_edit'),
     url(r'^groups/(?P<pk>\d+)/delete/$', GroupDeleteView.as_view(), name='groups_delete'),
 
-url(r'^journal/(?P<pk>\d+)?/?$', JournalView.as_view(), name='journal'),
+    url(r'^journal/(?P<pk>\d+)?/?$', JournalView.as_view(), name='journal'),
 
-url(r'^admin/', include(admin.site.urls)),
-url(r'^contact-admin/$', 'students.views.contact_admin.contact_admin', name='contact_admin'),
-                      )
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^contact-admin/$', 'students.views.contact_admin.contact_admin', name='contact_admin'),
+                       
+    url(r'^users/logout/$', auth_views.logout, kwargs={'next_page': 'home'}, name='auth_logout'),
+    url(r'^register/complete/$', RedirectView.as_view(pattern_name='home'), name='registration_complete'),
+    url(r'^users/', include('registration.backends.simple.urls', namespace='users')),
+    
+    url(r'^jsi18n\.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    url('^set-language/$', 'students.views.set_language.set_language', name='set_language'),
+                       
+
+)
+
+#urlpatterns = i18_patterns('',
+#    url(r'^$', 'path.to.homepage.view', name='homepage'),
+  #  url(r'^blog/$', include(blog_patterns), namespace='blog'),
+#    url(r'^events/', include(events_patterns, namespace='events')),                       
+#)
 
 
 

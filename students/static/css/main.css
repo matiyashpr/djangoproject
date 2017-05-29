@@ -14,7 +14,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 #group-selector {
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 #group-selector select {
@@ -42,3 +42,26 @@ th.day-header {
 #ajax-progress-indicator {
     display: none;
 }
+#lang-select {
+    margin-top: 14px;
+    margin-left: -120px;
+    padding: 0;
+}
+#lang-select button {
+    padding: 0;
+}
+.lang-select-form {
+    display:inline-block;
+}
+#user_toolbar loginbar {
+    margin-left: 500px;
+    text-align: right;
+}
+
+#user_toolbar {
+    margin-top: -53px;
+    text-align: right;
+    margin-left: 900px;
+}
+
+

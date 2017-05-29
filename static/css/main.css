@@ -14,7 +14,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 #group-selector {
-    margin-top: 30px;
+    margin-top: 300px;
 }
 
 #group-selector select {
@@ -26,4 +26,11 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 30px;
     color: #555555;
 }
+
+
+#loginbar {
+   margin-left: 500px;
+    text-align: right;
+}
+
 

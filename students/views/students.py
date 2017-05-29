@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
@@ -10,6 +10,7 @@ from django.contrib import messages
 
 from django.forms import ModelForm
 from django.views.generic import UpdateView, DeleteView
+from django.utils.translation import ugettext as _
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -49,7 +50,7 @@ def students_list(request):
             
 def students_add(request):
     
-        #Якщо форма була запощена:
+        #if form posted:
     if request.method == "POST":
         if request.POST.get('add_button') is not None:
 
@@ -59,52 +60,52 @@ def students_add(request):
             
             first_name = request.POST.get('first_name', '').strip()
             if not first_name:
-                errors['first_name'] = u"Ім'я є обов'язковим"
+                errors['first_name'] = _(u"First Name field is required")
             else:
                 data['first_name'] = first_name
              
             last_name = request.POST.get('last_name', '').strip()
             if not last_name :
-                errors['last_name'] = u"Прізвище є обов'язковим"
+                errors['last_name'] = _(u"Last name field is required")
             else:
                 data['last_name'] = last_name
                 
             birthday = request.POST.get('birthday', '').strip()
             if not birthday:
-                errors['birthday'] = u"Дата народження є обов'язковою"
+                errors['birthday'] = _(u"Birthdate field is required")
             else:
                 try:
                     datetime.strptime(birthday, '%Y-%m-%d')
                 except Exception:
-                    errors['birthday'] = u"Введіть коректний формат дати (напр. 1998-03-26)"
+                    errors['birthday'] = _(u"Enter currently format (Example 1998.02.26)")
                 else:
                     data['birthday'] = birthday
                 
             ticket = request.POST.get('ticket', '').strip()
             if not ticket:
-                errors['ticket'] = u"Номер білета є обов'язковим"
+                errors['ticket'] = _(u"Ticket number is required")
             else:
                 data['ticket'] = ticket
                 
             student_group = request.POST.get('student_group', '').strip()
             if not student_group:
-                errors['student_group'] = u"Оберіть групу для студента"
+                errors['student_group'] = _(u"Select the group for student")
             else:
                 groups = Group.objects.filter(pk=student_group)
                 if len(groups) != 1:
-                    errors['student_group'] = u"Оберіть конкретну групу"
+                    errors['student_group'] = _(u"Choose a specific group")
                 else:
                     data['student_group'] = groups[0]
             
             photo = request.FILES.get('photo')
             if not photo: 
-                errors['photo'] = u'Виберіть фото'
+                errors['photo'] = _(u'Choose a photo')
             else:
                 FORMAT_PHOTO = ('jpg', 'jpeg', 'png', 'bmp')
                 SIZE_PHOTO = 10
                 SIZE_THUMNAIL = (500,500)
                 if photo.size > SIZE_PHOTO*1024*1000:
-                    errors['photo'] = "".join(["Розмір фото не повинен перевищувати ", str(SIZE_PHOTO), "мегабайт"])
+                    errors['photo'] = "".join([_("Photo size should not exceed "), str(SIZE_PHOTO), _("megabyte")])
                     photo = None
 
 
@@ -122,13 +123,13 @@ def students_add(request):
                         im = InMemoryUploadedFile(_file, field_name, name, content_type, size=None, charset=None)
                         data['photo'] = im
                     except IOError: 
-                        errors['photo'] = "Це повинно бути фото, наприклад файли з розширенням %s" % ", ".join(FORMAT_PHOTO)
+                        errors['photo'] = _("This should be a picture, such as file format %s") % ", ".join(FORMAT_PHOTO)
                 
             if not errors:
                 student = Student(**data)
                 student.save()
             
-                messages.success(request, u'Студента %s %s успішно додано!' %(data['last_name'], data['first_name']))
+                messages.success(request, _(u'Student %s %s added successfully!') %(data['last_name'], data['first_name']))
                 return HttpResponseRedirect(reverse('home'))
             else:
                 # render form with errors and previous user input
@@ -136,9 +137,8 @@ def students_add(request):
                               {'groups': Group.objects.all().order_by('title'),
                                'errors': errors})
         
-        elif request.POST.get('cancel_button') is not None:
-            messages.warning(request, u'Додавання студента скасовано!')
-            return HttpResponseRedirect(reverse('home'))
+        elif request.POST.get('cancel_button') is not None: messages.warning(request, _(u'Adding student canceled!'))
+        return HttpResponseRedirect(reverse('home'))
             
     else:
           return render(request,'students/students_add.html',{'groups': Group.objects.all().order_by('title')})
@@ -153,7 +153,7 @@ def student_update(request, some_id):
         if form.is_valid():
             # do_something
             form.save()
-            messages.success(self.request, u"Студент - {}, був успішно редагований!".format(stud.some_name))
+            messages.success(self.request, _(u"Student - {}, was successfully updated!".format(stud.some_name)))
             return redirect(reverse('home'))
         return render(request, 'students/students_edit.html', {'form': form, 'student': stud}) 
     
@@ -164,7 +164,7 @@ class EditStudentView(UpdateView):
     form_class = StudentUpdateForm
 
     def get_success_url(self):
-        messages.success(self.request, u"Cтудент  {} був успішно редагований!".format(self.object.last_name))
+        messages.success(self.request, _(u"Student {} updated successfully!".format(self.object.last_name)))
         return reverse('home')
         
       
@@ -175,6 +175,6 @@ class StudentDeleteView(DeleteView):
     template_name = 'students/students_confirm_delete.html'
         
     def get_success_url(self):
-        return u'%s?status_message=Студента успішно видалено!' % reverse('home')
+        return _(u'%s?status_message=Student successfully deleted!') % reverse('home')
     
     

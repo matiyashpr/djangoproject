@@ -1,19 +1,19 @@
-# -*- coding: utf-8 -*-
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 class MonthJournal(models.Model):
 
     class Meta:
-        verbose_name = u'Місячний Журнал'
-        verbose_name_plural = u'Місячні Журнали'
+        verbose_name = _(u'Month Journal')
+        verbose_name_plural = _(u'Month Journals')
         
     student = models.ForeignKey('Student', 
-        verbose_name=u'Студент',
+        verbose_name=_(u'Student'),
         blank=False,
         unique_for_month='date',)
     
     date=models.DateField(
-        verbose_name=u'Дата',
+        verbose_name=_(u'Date'),
         blank=False)
         
     present_day1 = models.BooleanField(default=False)
