@@ -1,122 +1,116 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib import messages
-
 from django.forms import ModelForm
 from django.views.generic import CreateView, UpdateView, DeleteView
-from django.utils.translation import ugettext_lazy as _
+from functools import partial
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Div, HTML
+from crispy_forms.layout import Submit
 from crispy_forms.bootstrap import FormActions
 
 from ..models.groups import Group
+from ..util import paginate
 
-class GroupCreateForm(ModelForm):
+
+def groups_list(request):
+    groups = Group.objects.all()
+
+    # try to order groups list
+    order_by = request.GET.get('order_by', '')
+    if order_by in ('title',):
+        groups = groups.order_by(order_by)
+        if request.GET.get('reverse', '') == '1':
+            groups = groups.reverse()
+
+    # apply pagination, 2 groups per page
+    context = paginate(groups, 3, request, {}, var_name='groups')
+
+    return render(request, 'students/groups_list.html', context)
+
+
+class GroupForm(ModelForm):
     class Meta:
         model = Group
 
     def __init__(self, *args, **kwargs):
-        super(GroupCreateForm, self).__init__(*args, **kwargs)
+        super(GroupForm, self).__init__(*args, **kwargs)
 
         self.helper = FormHelper(self)
 
+        # add form or edit form
+        if kwargs['instance'] is None:
+            add_form = True
+        else:
+            add_form = False
+
         # set form tag attributes
-        self.helper.form_action = reverse('groups_add')
+        if add_form:
+            self.helper.form_action = reverse('groups_add')
+        else:
+            self.helper.form_action = reverse('groups_edit',
+                kwargs={'pk': kwargs['instance'].id})
         self.helper.form_method = 'POST'
         self.helper.form_class = 'form-horizontal'
 
         # set form field properties
         self.helper.help_text_inline = True
-        self.helper.html5_required = True
         self.helper.label_class = 'col-sm-2 control-label'
         self.helper.field_class = 'col-sm-10'
 
         # add buttons
-        self.helper.layout.append(FormActions(
-            Div(css_class = self.helper.label_class),
-            Submit('add_button', _(u'Save'), css_class="btn btn-primary"),
-            HTML(_(u"<a class='btn btn-link' name='cancel_button' href='{% url 'groups' %}?status_message=Add / Edit group canceled!'>Cancel</a>")),
-        ))
-        self.fields['leader'].queryset = self.fields['leader'].queryset.none()
-
-class GroupUpdateForm(GroupCreateForm):
-
-    def __init__(self, *args, **kwargs):
-        super(GroupUpdateForm, self).__init__(*args, **kwargs)
-        self.helper.form_action = reverse('group_edit', kwargs = {'pk': kwargs['instance'].id})
-        self.fields['leader'].queryset = self.instance.student_set.all().order_by('last_name')
-
-class GroupCreateView(CreateView):
-    model = Group
-    template_name = 'students/group_edit.html'
-    form_class = GroupCreateForm
-
-    def get_success_url(self):
-        messages.info(self.request, _(u'Group %s successfully added!') % self.object.title)
-        return reverse('groups')
-
-class GroupUpdateView(UpdateView):
-    model = Group
-    template_name = 'students/group_edit.html'
-    form_class = GroupUpdateForm
-
-    def form_valid(self, form):
-        leader = form.cleaned_data['leader']
-        if not leader or leader.student_group_id == form.instance.id:
-            return super(GroupUpdateView, self).form_valid(form)
+        if add_form:
+            submit = Submit('add_button', u'Додати',
+                css_class="btn btn-primary")
         else:
-            messages.error(self.request, _(u'The student belongs to another group'))
-            return super(GroupUpdateView, self).form_invalid(form)
+            submit = Submit('save_button', u'Зберегти',
+                css_class="btn btn-primary")
+        self.helper.layout[-1] = FormActions(
+            submit,
+            Submit('cancel_button', u'Скасувати', css_class="btn btn-link"),
+        )
+        
+    def get_form(self, request, obj=None, **kwargs):
+        kwargs['formfield_callback'] = partial(self.formfield_for_dbfield, request=request, obj=obj)
+        return super(GroupAdmin, self).get_form(request, obj, **kwargs)
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name != "leader":
+            kwargs.pop('obj', None)
+        return super(GroupForm, self).formfield_for_dbfield(db_field, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        group = kwargs.pop('obj', None)
+        if db_field.name == 'leader' and group:
+            kwargs['queryset'] = Student.objects.filter(student_group_id=group.id)
+        return super(GroupAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+class BaseGroupFormView(object):
 
     def get_success_url(self):
-        messages.info(self.request, _(u'Group %s successfully saved!') % self.object.title)
-        return reverse('groups')
+        return u'%s?status_message=Зміни успішно збережено!' % reverse('groups')
 
-
-def groups_list(request):
-    groups = Group.objects.all()
-    
-    if request.get_full_path() == "/":
-        #redirect request.GET on its copy(deep copy) which I will amend
-        request.GET = request.GET.copy()
-        #assign 'order_by' value 'last_name' 
-        request.GET.__setitem__('order_by', 'title')
-
-    order_by = request.GET.get('order_by', '')
-    if order_by in ('title', 'leader'):
-        groups = groups.order_by(order_by)
-        if request.GET.get('reverse', '') == '1':
-            groups = groups.reverse()
-    
-    
-    paginator = Paginator(groups, 3)
-    page = request.GET.get('page')
-    try:
-        groups = paginator.page(page)
-    except PageNotAnInteger:
-            groups = paginator.page (1)
-    except EmptyPage:
-         groups = paginator.page(paginator.num_pages)
-                
-                
-    return render(request, 'students/groups_list.html',
-                 {'groups' : groups})
-
-class GroupDeleteView(DeleteView):
-    model = Group
-    template_name = 'students/group_delete.html'
-
-    def get_success_url(self):
-        return _(u'%s?status_message=Group successfully deleted!') % reverse('groups')
-    
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        try:
-            self.object.delete()
-        except:
-             return HttpResponseRedirect(_(u"%s?status_message=Unable to delete a group - probably in the group are still students!") % reverse('groups'))
+    def post(self, request, *args, **kwargs):
+        # handle cancel button
+        if request.POST.get('cancel_button'):
+            return HttpResponseRedirect(reverse('groups') +
+                                        u'?status_message=Зміни скасовано.')
         else:
-            return HttpResponseRedirect(self.get_success_url())
+            return super(BaseGroupFormView, self).post(
+                request, *args, **kwargs)
+
+class GroupAddView(BaseGroupFormView, CreateView):
+    model = Group
+    form_class = GroupForm
+    template_name = 'students/groups_form.html'
+
+class GroupUpdateView(BaseGroupFormView, UpdateView):
+    model = Group
+    form_class = GroupForm
+    template_name = 'students/groups_form.html'
+
+class GroupDeleteView(BaseGroupFormView, DeleteView):
+    model = Group
+    template_name = 'students/groups_confirm_delete.html'

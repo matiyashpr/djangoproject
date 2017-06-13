@@ -7,6 +7,9 @@ from dateutil.relativedelta import relativedelta
 from calendar import monthrange, weekday, day_abbr
 from django.utils.translation import ugettext_lazy as _
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+
 from django.core.urlresolvers import reverse
 from django.views.generic.base import TemplateView
 
@@ -17,6 +20,10 @@ from ..util import paginate
 
 class JournalView(TemplateView):
     template_name = 'students/journal.html'
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(JournalView, self).dispatch(*args, **kwargs)
     
     def get_context_data(self, **kwargs):
         context = super(JournalView, self).get_context_data(**kwargs)

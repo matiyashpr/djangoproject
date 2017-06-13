@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.decorators import permission_required
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -47,7 +48,7 @@ class ContactForm(forms.Form):
         label=_(u"Text message"),
         widget=forms.Textarea)
     
-
+@permission_required('auth.add_user')
 def contact_admin(request):
 
     if request.method == 'POST':
