@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib import messages
+from django.core.files import File
 
 from django.forms import ModelForm
 from django.views.generic import UpdateView, DeleteView
@@ -18,6 +19,7 @@ from django.contrib.auth.decorators import login_required
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.bootstrap import FormActions
+from django.contrib.auth.models import User
 
 from django.shortcuts import get_object_or_404, redirect, render
 from .forms import StudentUpdateForm
@@ -26,19 +28,27 @@ from ..util import paginate, get_current_group
 from io import BytesIO
 from PIL import Image
 from datetime import datetime
+import pdb
 
 from ..models.students import Student
 from ..models.groups import Group
 
 import logging
-
-def students_list(request):
+@login_required
+def students_list(request):    
+    user = request.user
+    user_field = Student.user_field
     current_group = get_current_group(request)
+        
     if current_group:
         students = Student.objects.filter(student_group=current_group)
     else:
-        students = Student.objects.all()
-        
+        if Student.objects.filter(user_field=user) :
+            students = Student.objects.filter(user_field=user)
+        else:
+            students = Student.objects.all()
+   
+
     order_by = request.GET.get('order_by', '')
     if order_by in ('last_name', 'first_name', 'ticket'):
         students = students.order_by(order_by)
@@ -130,7 +140,7 @@ def students_add(request, *args, **kwargs):
                 
             if not errors:
                 student = Student(**data)
-                student.save()
+                student.save()      
             
                 messages.success(request, _(u'Student %s %s added successfully!') %(data['last_name'], data['first_name']))
                 return HttpResponseRedirect(reverse('home'))
@@ -147,8 +157,36 @@ def students_add(request, *args, **kwargs):
           return render(request,'students/students_add.html',{'groups': Group.objects.all().order_by('title')})
 
         
+class StudentUpdateForm(ModelForm):
+    class Meta:
+        model = Student
+        exclude = ['user_field']
 
-                
+    def __init__(self, *args, **kwargs):
+        super(StudentUpdateForm, self).__init__(*args, **kwargs)
+
+        self.helper = FormHelper(self)
+
+        # set form tag attributes
+        self.helper.form_action = reverse('students_edit',
+                                          kwargs={'pk': kwargs['instance'].id})
+        self.helper.form_method = 'POST'
+        self.helper.form_class = 'form-horizontal'
+
+        # set form field properties
+        self.helper.help_text_inline = True
+        self.helper.html5_required = True
+        self.helper.label_class = 'col-sm-2 control-label'
+        self.helper.field_class = 'col-sm-10'
+
+        # add buttons
+        self.helper.layout[-1] = FormActions(
+            Submit('add_button', _(u'Save'), css_class="btn btn-primary"),
+            Submit('cancel_button', _(u'Cancel'), css_class="btn btn-link"),
+        )
+        
+
+
 def student_update(request, some_id):
     stud = get_object_or_404(Student, id=some_id)
     form = StudentUpdateForm(request.POST or None, instance=stud)
@@ -159,32 +197,31 @@ def student_update(request, some_id):
             messages.success(self.request, _(u"Student - {}, was successfully updated!".format(stud.some_name)))
             return redirect(reverse('home'))
         return render(request, 'students/students_edit.html', {'form': form, 'student': stud}) 
-    
 
-class EditStudentView(UpdateView):
+
+class StudentUpdateView(UpdateView):
     model = Student
     template_name = 'students/students_edit.html'
     form_class = StudentUpdateForm
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(StudentUpdateView, self).dispatch(*args, **kwargs)
-
+    
     def get_success_url(self):
         messages.success(self.request, _(u"Student {} updated successfully!".format(self.object.last_name)))
         return reverse('home')
-
-
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(StudentUpdateView, self).dispatch(*args, **kwargs)
 
 
 class StudentDeleteView(DeleteView):
     model = Student
     template_name = 'students/students_confirm_delete.html'
-
+    
+    def get_success_url(self):
+        return _(u'%s?status_message=Student successfully deleted!') % reverse('home')
+    
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(StudentDeleteView, self).dispatch(*args, **kwargs)
 
-    def get_success_url(self):
-        return _(u'%s?status_message=Student successfully deleted!') % reverse('home')
 

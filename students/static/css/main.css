@@ -61,7 +61,12 @@ th.day-header {
 #user_toolbar {
     margin-top: -53px;
     text-align: right;
-    margin-left: 580px;
+    margin-left: 770px;
 }
 
 
+
+.form_student {
+    margin-left: 100px;
+    margin-top: auto;
+}

@@ -9,6 +9,7 @@ from models.groups import Group
 from models.monthjournal import MonthJournal
 from models.exam import Exam
 from models.exam_result import Exam_result
+from models.subject import Subject
 from functools import partial
 
 class StudentFormAdmin(ModelForm):
@@ -84,3 +85,4 @@ admin.site.register(Group, GroupAdmin)
 admin.site.register(MonthJournal)
 admin.site.register(Exam)
 admin.site.register(Exam_result)
+admin.site.register(Subject)

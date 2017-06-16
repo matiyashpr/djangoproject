@@ -15,11 +15,12 @@
 
 {% block content %}
 
-<form action="{% url "students_edit" student.id %}" method="POST">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-
+<form action="{% url "students_edit" student.id %}" method="POST" >
+    <div class="form_student">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+    </div>
 </form>
-
+<br>
 {% endblock content %}

@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from students.views.groups import GroupAddView, GroupUpdateView, GroupDeleteView, groups_list
-from students.views.students import EditStudentView, StudentDeleteView
+from students.views.students import StudentUpdateView, StudentDeleteView
 from .settings import MEDIA_ROOT, DEBUG
 from students.views.journal import JournalView
 from django.conf.urls import include, url 
@@ -10,6 +10,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import RedirectView, TemplateView
 from django.contrib.auth.decorators import login_required
+from students.views.subject import SubjectCreateView, SubjectUpdateView, SubjectDeleteView
 from students.views.exams import ExamCreateView, ExamUpdateView, ExamDeleteView
 from students.views.exam_results import ExamResultCreateView
 from students.views.random_user import generate_users
@@ -25,7 +26,7 @@ urlpatterns = patterns('',
 
     url(r'^$', 'students.views.students.students_list', name='home'),
     url(r'^students/add/?$', 'students.views.students.students_add', name='students_add'),
-    url(r'^students/(?P<pk>\d+)/edit/$', EditStudentView.as_view(), name='students_edit'),
+    url(r'^students/(?P<pk>\d+)/edit/$', StudentUpdateView.as_view(), name='students_edit'),
     url(r'^students/(?P<pk>\d+)/delete/$', StudentDeleteView.as_view(), name='students_delete'),
 
 # Groups urls
@@ -61,6 +62,11 @@ urlpatterns = patterns('',
 
     url(r'^exam_results/$', 'students.views.exam_results.exam_results', name='exam_results'), 
     url(r'^exam_results/add/$', ExamResultCreateView.as_view(), name='exam_result_add'),
+                       
+    url(r'^subjects/$', 'students.views.subject.subject_list', name='subjects'),
+    url(r'^subjects/add/$', SubjectCreateView.as_view(), name='subjects_add'),
+    url(r'^subjects/(?P<pk>\d+)/edit/$', SubjectUpdateView.as_view(), name='subjects_edit'),
+    url(r'^subjects/(?P<pk>\d+)/delete/$', SubjectDeleteView.as_view(), name='subjects_delete'),
 
     url(r'^random_user/$', 'students.views.random_user.generate_users', name='generate_user'),
 )

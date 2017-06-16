@@ -1,0 +1,21 @@
+{% extends "students/base.html" %}
+{% load i18n %}
+
+{% load static from staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block meta_title %}{% trans "Delete subject" %}{% endblock meta_title %}
+
+{% block title %}{% trans "Delete subject" %}{% endblock title %}
+
+{% block content %}
+
+<form action="{% url "subjects_delete" object.id %}" method="post">
+    {% csrf_token %}
+    <p>{% trans "Do you realy wan't subject" %}  "{{ object }}"?</p>
+    <input type="submit" value="Так" name="delete_button" class="btn btn-danger" />
+    <a href="{% url "subjects" %}" class="btn btn-info"> No</a>
+    <br /><br />
+</form>
+
+{% endblock content %}

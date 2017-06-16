@@ -12,10 +12,11 @@ from django.contrib.auth.decorators import login_required
 
 from django.core.urlresolvers import reverse
 from django.views.generic.base import TemplateView
+from django.contrib.auth.decorators import permission_required
 
 from ..models.students import Student
 from ..models.monthjournal import MonthJournal
-from ..util import paginate
+from ..util import paginate, get_current_group
 
 
 class JournalView(TemplateView):
@@ -28,6 +29,10 @@ class JournalView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(JournalView, self).get_context_data(**kwargs)
         
+        user = self.request.user
+        user_field = Student.user_field
+        current_group = get_current_group(self.request)
+                
         if self.request.GET.get('month'):
             month = datetime.strptime(self.request.GET['month'], '%Y-%m-%d').date()
         else:          
@@ -50,8 +55,13 @@ class JournalView(TemplateView):
         
         if kwargs.get('pk'):
             queryset = [Student.objects.get(pk=kwargs['pk'])]
+        elif current_group:
+            queryset = Student.objects.filter(student_group=current_group)
         else: 
-            queryset = Student.objects.all().order_by('last_name')
+            if Student.objects.filter(user_field=user) :
+                queryset = Student.objects.filter(user_field=user)
+            else:
+                queryset = Student.objects.all().order_by('last_name')
         
         update_url = reverse('journal')
         
@@ -80,7 +90,7 @@ class JournalView(TemplateView):
         context = paginate(students, 10, self.request, context, var_name='students')
         
         return context
-
+   
     def post(self, request, *args, **kwargs):
         data = request.POST
         

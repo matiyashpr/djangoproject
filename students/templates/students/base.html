@@ -3,153 +3,134 @@
 
 <!DOCTYPE html>
 <html lang="uk">
-  <head>
-    <meta charset="UTF-8">
-      <title>{% trans "Students Accounting Service" %} - {% block meta_title %}{% endblock meta_title %}</title>
-    <meta name="description"
-          value="{% trans "App to manage students database"}" />  
-    
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.3.0/css/bootstrap.min.css">
-      <link rel="stylesheet"
-            href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.0.0/css/bootstrap-datetimepicker.min.css">
-      <link rel="stylesheet"
-            href="{{ PORTAL_URL }}{% static "css/main.css" %}">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% trans "Students Accounting Service" %} - {% block meta_title %}{% endblock meta_title %}</title>
+        <meta name="description"
+              value="{% trans "App to manage students database"}" />
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/bootstrap/3.3.0/css/bootstrap.min.css">
+        <link rel="stylesheet"
+              href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.0.0/css/bootstrap-datetimepicker.min.css">
+        <link rel="stylesheet"
+              href="{{ PORTAL_URL }}{% static "css/main.css" %}">
 
-    <!--        <style type="text/css">.col-xs-12, .col-xs-4, .col-xs-8 {border:1px solid red;}</style>-->
-     
-      {% block extra_css %}{% endblock extra_css %}
-      
-  </head>
-  <body>
-        
-    <!-- Start Container -->
+        {% block extra_css %}{% endblock extra_css %}
+    </head>
+    <body>
 
-    <div class="container">
+        <div class="container">
+            <div class="row" id="header">
+                <div class="col-xs-8">
+                    <h1>{% trans "Progressive Students" %}</h1>     
+                </div>                
+                <div class="col-xs-1" id='lang-select'>
+                    <div class="lang-select-form">
+                        <form action="{% url "set_language" %}" method="post">{% csrf_token %}
+                            <input type="hidden" name="lang" value="uk">
+                            <input type="hidden" name="return-path" value='{{request.path}}'>
+                            <button type="submit" class='btn btn-link'>Укр</button> |
+                        </form>
+                    </div>
+                    <div class="lang-select-form">
+                        <form action="{% url "set_language" %}" method="post">{% csrf_token %}
+                            <input type="hidden" name="lang" value="en">
+                            <input type="hidden" name="return-path" value='{{request.path}}'>
+                            <button type="submit" class='btn btn-link'>Eng</button>
+                        </form>
+                    </div>
+                </div>                
 
-      <!-- Start Header -->
+                {% if user.is_authenticated %}
+                {% if perms.auth.add_user %}
 
-      <div class="row" id="header">
+                <div class="col-xs-4 groupindex" id="group-selector">
+                    <strong>{% trans "Group:" %}</strong>
+                    <select>
+                        <option value="">{% trans "All students" %}</option>
+                        {% for group in GROUPS %}
+                        <option value="{{ group.id }}"{% if group.selected %}selected="1"{% endif %}>{{ group.title }}{% if group.leader %}, {{ group.leader }}{% endif%} </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <!-- Logo -->
+                {% endif %}
 
-        <div class="col-xs-8">
-          <h1>{% trans "Students Accounting Service" %}</h1>      
-        </div>
-        
-                        
-          <!-- Language Select -->
+                <div class="col-xs-4" id="user_toolbar">
+                    <a href="{% url "profile" %}">{{ user.get_full_name|default:user.username }}</a> |
+                    <a href="{% url "users:auth_logout" %}">{% trans "Logout" %}</a>
+                </div>
 
-          <div class="col-xs-1" id='lang-select'>
-              <div class="lang-select-form">
-                  <form action="{% url "set_language" %}" method="post">{% csrf_token %}
-                      <input type="hidden" name="lang" value="uk">
-                      <input type="hidden" name="return-path" value='{{request.path}}'>
-                      <button type="submit" class='btn btn-link'>Укр</button> |
-                  </form>
-              </div>
-              <div class="lang-select-form">
-                  <form action="{% url "set_language" %}" method="post">{% csrf_token %}
-                      <input type="hidden" name="lang" value="en">
-                      <input type="hidden" name="return-path" value='{{request.path}}'>
-                      <button type="submit" class='btn btn-link'>Eng</button>
-                  </form>
-              </div>
-          </div>
-          <!-- End Language Select -->
+                {% else %}
 
-        <!-- Groups Selector -->
-        {% if user.is_authenticated %}
-        <div class="col-xs-4 groupindex" id="group-selector">
-            <strong>{% trans "Group:" %}</strong>
-          <select>
-              <option value="">{% trans "All students" %}</option>
-            {% for group in GROUPS %}
-            <option value="{{ group.id }}"{% if group.selected %}selected="1"{% endif %}>{{ group.title }}{% if group.leader %}, {{ group.leader }}{% endif%} </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-xs-6" id="user_toolbar">
-            <a href="{% url "profile" %}">{{ user.get_full_name|default:user.username }}</a> |
-            <a href="{% url "users:auth_logout" %}">{% trans "Logout" %}</a>
-        </div>
-        
-        {% else %}
-        
-        <div class="col-xs-6" id="user_toolbar">
-            <a href="{% url 'social:begin' 'facebook' %}?next={{request.path}}">{% trans "via Facebook" %}</a> |
-            <a href="{% url "users:auth_login" %}">{% trans "Login" %}</a> |
-            <a href="{% url "users:registration_register" %}">{% trans "Register" %}</a>
-        </div>
-        {% endif %}
-      </div>
+                <div class="col-xs-4" id="user_toolbar">
+                    <!--<a href="{% url 'social:begin' 'facebook' %}?next={{request.path}}">{% trans "via Facebook" %}</a> |-->
+                    <!--<a href="{% url "users:auth_login" %}">{% trans "Login" %}</a> -->
+                    <!--<a href="{% url "users:registration_register" %}">{% trans "Register" %}</a>-->
+                </div>
 
-      <!-- End Header -->
-      <!-- Start SubHeader -->
+                {% endif %}
 
-      <div class="row" id="sub-header">
-        <div class="col-xs-12">
-          <ul class="nav nav-tabs" role="tablist">
-              <li role="presentation" {% if request.path == '/' %} class="active" {%endif%} >    <a href="{% url "home" %}">{% trans "Students" %}</a></li>
-              
-              {% if user.is_authenticated %}
-              <li role="presentation" {% if '/journal' in request.path %} class="active" {%endif%}><a href="{% url "journal" student.id %}">{% trans "Journal" %}</a></li>
-              <li role="presentation" {% if '/groups' in request.path %} class="active" {%endif%}><a href="{% url "groups" %}">{% trans "Groups" %}</a></li>
-              {% url "exams" as url_exams %}
-              <li role="presentation" {% if url_exams in request.path %}class="active"{% endif %}><a href="{% url "exams" %}">Іспити</a></li>
-              {% url "exam_results" as url_exam_results %}
-              <li role="presentation" {% if url_exam_results in request.path %}class="active"{% endif %}><a href="{% url "exam_results" %}">Результати іспитів</a></li>
-              {% endif %}
-              
-              {% if perms.auth.add_user %}
-              <li role="presentation" {% if '/contact-admin' in request.path %} class="active" {% endif %}>
-                  <a href="{% url "contact_admin" %}">{% trans "Contact" %}</a></li>
-              {% endif %}
-          </ul>
-        </div>
-      </div>
+            </div>
 
-      <!-- End SubHeader -->
+            {% if user.is_authenticated %}
 
-      <!-- Start Main Page Content -->
+            <div class="row" id="sub-header">
+                <div class="col-xs-12">
+                    <ul class="nav nav-tabs" role="tablist">
+                        {% if perms.auth.add_user %}
+                        <li role="presentation" {% if request.path == '/' %} class="active" {%endif%} ><a href="{% url "home" %}">{% trans "Students" %}</a></li> 
+                        {% endif %}
+                        <li role="presentation" {% if '/journal' in request.path %} class="active" {%endif%}><a href="{% url "journal" student.id %}">{% trans "Journal" %}</a></li>
+                        {% if perms.auth.add_user %}
+                        <li role="presentation" {% if '/groups' in request.path %} class="active" {%endif%}><a href="{% url "groups" %}">{% trans "Groups" %}</a></li>
+                        {% url "subjects" as url_subjects %}
+                        <li role="presentation" {% if url_subjects in request.path %}class="active"{% endif %}><a href="{% url "subjects" %}">{% trans "Subjects" %}</a></li>
+                        {% endif %}
+                        {% url "exams" as url_exams %}
+                        <li role="presentation" {% if url_exams in request.path %}class="active"{% endif %}><a href="{% url "exams" %}">{% trans "Exams" %}</a></li>
+                        {% url "exam_results" as url_exam_results %}
+                        <li role="presentation" {% if url_exam_results in request.path %}class="active"{% endif %}><a href="{% url "exam_results" %}">{% trans "Exam results" %}</a></li>                        
+                        <li role="presentation" {% if '/contact_admin' in request.path %} class="active" {% endif %}>
+                            <a href="{% url "contact_admin" %}">{% trans "Contact" %}</a></li>  
+                    </ul>
+                </div>
+            </div>
 
-      <div class="row" id="content-columns">
-        <div class="col-xs-12" id="content-column">
-          <!-- Status Message -->
-            {% block status_message %}
-            {% if request.GET.status_message %}
-            <div class="alert alert-warning" role="alert">{{ request.GET.status_message }}</div>
             {% endif %}
 
-            {% if messages %}
-            {% for message in messages %}
-            <p {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</p>
-            {% endfor %}
-            {% endif %}
+            <div class="row" id="content-columns">
+                <div class="col-xs-12" id="content-column">
 
-            {% endblock %}
+                    {% block status_message %}
 
-            <h2>{% block title %}{% endblock title %}</h2>
-             {% block content %}{% endblock content %}
-         
-        </div>
-      </div>
+                    {% if request.GET.status_message %}
 
-       
-      <!-- End Main Page Content -->
-      <!-- Start Footer -->
+                    <div class="alert alert-warning" role="alert">{{ request.GET.status_message }}</div>
 
+                    {% endif %}
+
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</p>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% endblock %}
+
+                    <h2>{% block title %}{% endblock title %}</h2>
+
+                    {% block content %}{% endblock content %}
+
+                </div>
+            </div>
+            
       <div class="row" id="footer">
         <div class="col-xs-12">
-            &copy; 2017 {% trans "Students Accounting Service" %}
+            &copy; 2017 {% trans "Progressive Students" %}
         </div>
       </div>
-
-      <!-- End Footer -->
-
     </div>
-    <!-- End Container -->
-
-   
 
 <!--    Modal Boilerplate   -->
   
@@ -166,20 +147,18 @@
             </div>
         </div>
     </div>  
-   
-    <!-- Javascripts Section -->    
-
-      <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-      <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
-      <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
-      <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
-      <script src="{% static "js/jquery.cookie.js" %}"></script>
-      <script src="https://cdn.jsdelivr.net/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-      <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.0.0/js/bootstrap-datetimepicker.min.js"></script>
-      <script src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
-      <script src="{% static "js/main.js" %}"></script>
-      
-<!--      <script src="/static/js/bootstrap.min.js"></script>-->
+       
+        <!-- Javascripts Section --> 
+           
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+        <script src="{% static "js/jquery.cookie.js" %}"></script>
+        <script src="https://cdn.jsdelivr.net/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.0.0/js/bootstrap-datetimepicker.min.js"></script>
+        <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+        <script src="{% static "js/main.js" %}"></script>
       {% block extra_js %}{% endblock extra_js %}
   </body>
 </html>

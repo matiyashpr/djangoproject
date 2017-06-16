@@ -2,11 +2,8 @@
 {% load i18n %}
 {% load static from staticfiles %}
 {% load crispy_forms_tags %}
-
 {% block meta_title %}{% trans "Contact administrator" %}{% endblock meta_title %}
-
 {% block title %}{% trans "Contact" %}{% endblock title %}
-
 {% block status_message %}
 {% if form.errors %}
     <div class="alert alert_warning" role="alert">
@@ -20,14 +17,5 @@
 {% block content %}
 
 {% crispy form %}
-
-<!--<form action="{% url "contact_admin" %}" method="post">
-    {% csrf_token %}
-    
-    {{ from.as_p }}
-   
-    {{ form.as_ul }}
-    <input type="submit" value="Надіслати" name="send_button" />
-</form> -->
-
+<br>
 {% endblock content %}

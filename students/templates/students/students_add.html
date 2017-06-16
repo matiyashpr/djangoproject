@@ -1,9 +1,9 @@
 {% extends "students/base.html" %}
 {% load static from staticfiles %}
-
 {% load i18n %}
 {% block meta_title %}{% trans "Students" %}{% endblock meta_title %}
 {% block title %}{% trans "Add Student" %}{% endblock title %}
+
 {% block status_message %}
 {% if errors %}
 <div class="alert alert-warning" role="alert">
@@ -11,6 +11,7 @@
 </div>
 {% endif %}
 {% endblock status_message %}
+
 {% block content %}
 
 <form action="{% url "students_add" %}" method="post" enctype="multipart/form-data" role="form" class="form-horizontal">
@@ -88,7 +89,7 @@
         <label class="col-sm-2 control-label"></label>
         <div class="col-sm-10">
             <input type="submit" value="{% trans "Add" %}" name="add_button" class="btn btn-primary" />
-            <button type="submit" name="cancel_button" class="btn btn-link">{% trans "Cancle" %}</button>
+            <button type="submit" name="cancel_button" class="btn btn-link">{% trans "Cancel" %}</button>
         </div>
     </div>
 

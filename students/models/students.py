@@ -1,14 +1,13 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
-
-# Create your models here.
-
-
+from django.contrib.auth.models import User
+from django.dispatch import receiver
 
 class Student(models.Model):
-        """Student Model"""
         
         class Meta(object):
             verbose_name = _(u"Student")
@@ -54,7 +53,9 @@ class Student(models.Model):
             blank=False,
             null=True,
             on_delete=models.PROTECT)
-
+        
+        user_field = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user", null=True, blank=False)
+               
         def __unicode__(self):
             return u"%s %s" % (self.first_name, self.last_name)  
           

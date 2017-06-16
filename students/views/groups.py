@@ -6,7 +6,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.forms import ModelForm
 from django.views.generic import CreateView, UpdateView, DeleteView
 from functools import partial
-
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.bootstrap import FormActions
@@ -17,19 +18,15 @@ from ..util import paginate
 
 def groups_list(request):
     groups = Group.objects.all()
-
-    # try to order groups list
+    
     order_by = request.GET.get('order_by', '')
     if order_by in ('title',):
         groups = groups.order_by(order_by)
         if request.GET.get('reverse', '') == '1':
             groups = groups.reverse()
 
-    # apply pagination, 2 groups per page
     context = paginate(groups, 3, request, {}, var_name='groups')
-
     return render(request, 'students/groups_list.html', context)
-
 
 class GroupForm(ModelForm):
     class Meta:
@@ -40,13 +37,11 @@ class GroupForm(ModelForm):
 
         self.helper = FormHelper(self)
 
-        # add form or edit form
         if kwargs['instance'] is None:
             add_form = True
         else:
             add_form = False
 
-        # set form tag attributes
         if add_form:
             self.helper.form_action = reverse('groups_add')
         else:
@@ -55,21 +50,19 @@ class GroupForm(ModelForm):
         self.helper.form_method = 'POST'
         self.helper.form_class = 'form-horizontal'
 
-        # set form field properties
         self.helper.help_text_inline = True
         self.helper.label_class = 'col-sm-2 control-label'
-        self.helper.field_class = 'col-sm-10'
-
-        # add buttons
+        self.helper.field_class = 'col-sm-10'  
+        
         if add_form:
-            submit = Submit('add_button', u'Додати',
+            submit = Submit('add_button', _(u'Add'),
                 css_class="btn btn-primary")
         else:
-            submit = Submit('save_button', u'Зберегти',
+            submit = Submit('save_button', _(u'Save'),
                 css_class="btn btn-primary")
         self.helper.layout[-1] = FormActions(
             submit,
-            Submit('cancel_button', u'Скасувати', css_class="btn btn-link"),
+            Submit('cancel_button', _(u'Cancel'), css_class="btn btn-link"),
         )
         
     def get_form(self, request, obj=None, **kwargs):
@@ -86,20 +79,25 @@ class GroupForm(ModelForm):
         if db_field.name == 'leader' and group:
             kwargs['queryset'] = Student.objects.filter(student_group_id=group.id)
         return super(GroupAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    def clean_leader(self):
+        student_instance = self.cleaned_data.get('leader')
+        if student_instance:
+            if student_instance.student_group_id == self.instance.id:
+                return student_instance
+            else:
+                self.add_error('leader', ValidationError (_(u'This student from other group.')))
 
 class BaseGroupFormView(object):
 
     def get_success_url(self):
-        return u'%s?status_message=Зміни успішно збережено!' % reverse('groups')
+        return _(u'%s?status_message=Changes successfully saved!') % reverse('groups')
 
     def post(self, request, *args, **kwargs):
-        # handle cancel button
         if request.POST.get('cancel_button'):
-            return HttpResponseRedirect(reverse('groups') +
-                                        u'?status_message=Зміни скасовано.')
+            return HttpResponseRedirect(reverse('groups') +_( u'?status_message=Changes canceled.'))
         else:
-            return super(BaseGroupFormView, self).post(
-                request, *args, **kwargs)
+            return super(BaseGroupFormView, self).post(request, *args, **kwargs)
 
 class GroupAddView(BaseGroupFormView, CreateView):
     model = Group
