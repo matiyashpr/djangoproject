@@ -42,11 +42,9 @@ def students_list(request):
         
     if current_group:
         students = Student.objects.filter(student_group=current_group)
+    
     else:
-        if Student.objects.filter(user_field=user) :
-            students = Student.objects.filter(user_field=user)
-        else:
-            students = Student.objects.all()
+        students = Student.objects.all()
    
 
     order_by = request.GET.get('order_by', '')

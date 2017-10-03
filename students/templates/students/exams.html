@@ -55,7 +55,7 @@
         <tr>
             <td>{% if is_paginated %}{{ page_obj.start_index|add:forloop.counter0 }}{% else %}{{ forloop.counter }}{% endif %}</td>
             <td>{{ exam.date }}</td>
-            <td><a title="Редагувати" href="{% url "groups_edit" exam.exam_group.id %}">{{ exam.exam_group.title }}</a></td>
+            <td>{{ exam.exam_group.title }}
             <td>{{ exam.title }}</td>
             <td>{{ exam.teacher }}</td>
             

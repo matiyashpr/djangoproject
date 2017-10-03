@@ -78,8 +78,34 @@ class ExamResultCreateForm(ModelForm):
 
 class ExamResultCreateView(CreateView):
     model = Exam_result
-    template_name = 'students/exams_edit.html'
+    template_name = 'students/exam_result_edit.html'
     form_class = ExamResultCreateForm
     
-    def get_success_url(request):
-        return render(request, 'students/exam_results.html')
+    def get_success_url(self):
+        messages.success(self.request, _(u'Exam result %s added successfully!') % self.object)
+        return reverse('exam_results')
+    
+    
+    
+class ExamResultUpdateForm(ExamResultCreateForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ExamResultUpdateForm, self).__init__(*args, **kwargs)
+        self.helper.form_action = reverse('exam_result_edit', kwargs = {'pk': kwargs['instance'].id})
+
+class ExamResultUpdateView(UpdateView):
+    model = Exam_result
+    template_name = 'students/exam_result_edit.html'
+    form_class = ExamResultUpdateForm
+
+    def get_success_url(self):
+        messages.success(self.request, _(u'Exam result %s saved successfully!') % self.object)
+        return reverse('exam_results')
+
+class ExamResultDeleteView(DeleteView):
+    model = Exam_result
+    template_name = 'students/exams_result_confirm_delete.html'
+
+    def get_success_url(self):
+        messages.success(self.request, _(u'Exam result %s delete successfully!') % self.object)
+        return reverse('exam_results')

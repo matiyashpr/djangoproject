@@ -58,6 +58,9 @@
                     {% elif order_by == 'evaluation' and reverse == '1' %}&darr;{% endif %}
                 </a>
             </th>
+            {% if perms.auth.add_user %}
+            <th>{% trans "Action" %}</th>
+            {% endif %}
         </tr>
     </thead>
     {% endwith %}
@@ -72,6 +75,21 @@
             <td>{{ exam.student_name }}</td>
             <td>{{ exam.evaluation }}</td>
             <td><a title="Редагувати" href="#">{{ exam.exam_group.title }}</a></td>
+            {% if perms.auth.add_user %}
+
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">{% trans "Action" %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li> <a href="{% url "exam_result_edit" exam.id %}">{% trans "Edit" %}</a> </li>
+                        <li> <a href="{% url "exam_result_delete" exam.id %}">{% trans "Delete" %}</a> </li>
+                    </ul>
+                </div>
+            </td>
+
+            {% endif %}
         </tr>
         {% endfor %}
 

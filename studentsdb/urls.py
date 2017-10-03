@@ -12,7 +12,7 @@ from django.views.generic.base import RedirectView, TemplateView
 from django.contrib.auth.decorators import login_required
 from students.views.subject import SubjectCreateView, SubjectUpdateView, SubjectDeleteView
 from students.views.exams import ExamCreateView, ExamUpdateView, ExamDeleteView
-from students.views.exam_results import ExamResultCreateView
+from students.views.exam_results import ExamResultCreateView, ExamResultUpdateView, ExamResultDeleteView
 from students.views.random_user import generate_users
 
 
@@ -62,6 +62,8 @@ urlpatterns = patterns('',
 
     url(r'^exam_results/$', 'students.views.exam_results.exam_results', name='exam_results'), 
     url(r'^exam_results/add/$', ExamResultCreateView.as_view(), name='exam_result_add'),
+    url(r'^exam_results/(?P<pk>\d+)/edit/$', ExamResultUpdateView.as_view(), name='exam_result_edit'),
+    url(r'^exam_results/(?P<pk>\d+)/delete/$', ExamResultDeleteView.as_view(), name='exam_result_delete'),
                        
     url(r'^subjects/$', 'students.views.subject.subject_list', name='subjects'),
     url(r'^subjects/add/$', SubjectCreateView.as_view(), name='subjects_add'),
